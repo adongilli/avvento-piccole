@@ -268,10 +268,12 @@ document.addEventListener("DOMContentLoaded", () => {
         content.className = "cont";
         content.innerHTML=`<h2 class="text">${d.text}</h2>`;
         back.appendChild(content);
-        const img = document.createElement("img");
-        img.src = d.image;
-        img.className = "image"
-        content.appendChild(img);
+        if(d.image!=""){
+            const img = document.createElement("img");
+            img.src = d.image;
+            img.className = "image"
+            content.appendChild(img);
+        }
         if(d.download!=""){
             const icon = document.createElement("img");
             icon.src = "icon-download.png";
@@ -287,9 +289,10 @@ document.addEventListener("DOMContentLoaded", () => {
             const player = new Audio(d.audio);
             player.preload = "none";
 
-            const btn = document.createElement("img");
-            btn.className = "logo-download";
-            btn.src = "icona-audio.png";  
+            const btn = document.createElement("button");
+            btn.type = "button";
+            btn.className = "audio-btn";
+            btn.innerHTML = '<img src="icona-audio.png" alt="audio">';  
 
             btn.addEventListener("click", () => {
                 if (player.paused) {
