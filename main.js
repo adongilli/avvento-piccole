@@ -72,7 +72,7 @@ document.addEventListener("DOMContentLoaded", () => {
         {
             day: 8,
             type: "memory",
-            image: "",
+            image: "08-memory.png",
             text: "Gioca con la mamma e il papà….chi avrà più memoria vincerà!",
             link: "",
             download: "08-memory.pdf",
