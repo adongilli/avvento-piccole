@@ -252,6 +252,13 @@ document.addEventListener("DOMContentLoaded", () => {
         }
     };
     
+    // Ti manca di salvare lo stato dei giorni aperti, non avendo il backend, puoi usare localStorage per salvare i giorni aperti. Ecco un esempio di come potresti fare:
+    // Salva i giorni aperti in localStorage (il localStorage è un oggetto che permette di salvare dati nel browser dell'utente)
+    // nel localStorage puoi salvare un array di numeri che rappresentano i giorni aperti, ad esempio: [1, 2, 3] significa che i giorni 1, 2 e 3 sono stati aperti.
+    // usiamo JSON.parse perche nel localStorage i dati vengono salvati come stringhe, quindi dobbiamo convertirli in array.
+    // la parte finale || [] serve a dire che se non ci sono giorni aperti salvati, allora l'array sarà vuoto.
+    const openDays = JSON.parse(localStorage.getItem('openDaysPiccole')) || [];
+
     for(let i = 1; i <= 25; i++){
          const d = days[i - 1];
         const clone = template.content.cloneNode(true);
@@ -260,9 +267,32 @@ document.addEventListener("DOMContentLoaded", () => {
         const back = clone.querySelector('.card-back');
         dayBox.setAttribute('data-day', i);
         numberSpan.textContent = i;
+
+        // Aggiungi la classe 'is-flipped' se il giorno è già aperto
+        if (openDays.includes(i)) {
+            dayBox.classList.add('alreadyflipped');
+        }
+
         dayBox.addEventListener('click', () => {
             dayBox.classList.toggle('is-flipped');
+            // Aggiorna la lista dei giorni aperti in localStorage
+            if (dayBox.classList.contains('is-flipped')) {
+                // aggiorno l'array openDays solo se il giorno non è già presente
+                if (!openDays.includes(i))
+                    openDays.push(i);
+            } else {
+                // rimuovo il giorno dall'array openDays
+                // uso indexOf per trovare l'indice dell'elemento da rimuovere
+                const index = openDays.indexOf(i);
+                if (index > -1) {
+                    // uso splice per rimuovere l'elemento dall'array tramite l'indice trovato
+                    openDays.splice(index, 1);
+                }
+            }
+            // Salvo l'array aggiornato in localStorage
+            localStorage.setItem('openDaysPiccole', JSON.stringify(openDays));
         });
+
         container.appendChild(clone);
         const content = document.createElement("div");
         content.className = "cont";
@@ -279,7 +309,9 @@ document.addEventListener("DOMContentLoaded", () => {
             icon.src = "icon-download.png";
             icon.className = "logo-download";
             const a = document.createElement("a");
-            a.href = d.pdf;
+            // stesso errore delle grandi, non hai pdf ma download
+            //a.href = d.pdf;
+            a.href = d.download
             a.download = d.text + ".pdf";  
             a.addEventListener('click', (e) => e.stopPropagation());
             back.appendChild(a);
@@ -292,15 +324,19 @@ document.addEventListener("DOMContentLoaded", () => {
             const btn = document.createElement("button");
             btn.type = "button";
             btn.className = "audio-btn";
-            btn.innerHTML = '<img src="icona-audio.png" alt="audio">';  
+            btn.innerHTML = '<img src="play.svg" alt="audio">'; // ti ho cambiato la immagine con il play  
+  
 
             btn.addEventListener("click", () => {
+                 evt.stopPropagation() // ti ho aggiunto cosi non si chiude se fai click sull'icona, ti ho cancellato sotto perche lo avevi messo sbagliato
                 if (player.paused) {
                     player.play();
+                    btn.innerHTML = '<img src="stop.svg" alt="audio">';
                 } else {
+                    btn.innerHTML = '<img src="play.svg" alt="audio">';
                     player.pause();
                 }
-                btn.addEventListener('click', (e) => e.stopPropagation());
+                // btn.addEventListener('click', (e) => e.stopPropagation()); // questo non va bene, ogni volta che premi aggiungi un listener click che poi si sofrappongono e non partono.
             });
             back.appendChild(btn);
         }
